@@ -7,6 +7,8 @@ import time
 from contextlib import contextmanager
 
 from django.db import NotSupportedError
+from django.utils.version import PY39
+
 
 logger = logging.getLogger('django.db.backends')
 
@@ -215,7 +217,11 @@ def names_digest(*args, length):
     Generate a 32-bit digest of a set of arguments that can be used to shorten
     identifying names.
     """
-    h = hashlib.md5()
+    if PY39:
+        h = hashlib.md5(usedforsecurity=False)
+    else:
+        h = hashlib.md5()
+
     for arg in args:
         h.update(arg.encode())
     return h.hexdigest()[:length]
